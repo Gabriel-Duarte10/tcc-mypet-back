@@ -1,13 +1,15 @@
 using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using tcc_mypet_back.Data.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpContextAccessor();
 
-// builder.Services.AddDbContext<DataContext>(options =>
-//                 options.UseSqlServer(Configuration.GetConnectionString("Base")));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Base")));
 
 builder.Services.AddControllers((options => {
     options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
