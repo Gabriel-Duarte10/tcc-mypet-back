@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using tcc_mypet_back.Data.Models;
@@ -128,8 +129,22 @@ namespace tcc_mypet_back.Data.Context
                 .HasOne(fp => fp.Pet)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var deleteAtProperty = entityType.FindProperty("DeleteAt");
+                if (deleteAtProperty != null && deleteAtProperty.ClrType == typeof(DateTime?))
+                {
+                    var parameter = Expression.Parameter(entityType.ClrType, "p");
+                    var propertyAccess = Expression.PropertyOrField(parameter, "DeleteAt");
+                    var nullConstant = Expression.Constant(null, typeof(DateTime?));
+                    var comparison = Expression.Equal(propertyAccess, nullConstant);
+                    var lambda = Expression.Lambda(comparison, parameter);
+
+                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+                }
+            }
+
         }
-
-
     }
 }

@@ -2,6 +2,8 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using tcc_mypet_back.Data.Context;
+using tcc_mypet_back.Data.Interfaces;
+using tcc_mypet_back.Data.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,7 @@ builder.Services.AddCors(options =>
 
 #endregion
 #region Interfaces e serviços
+builder.Services.AddScoped<IAdministratorRepository, AdministratorRepository>();
 #endregion
 
 #region Swagger
