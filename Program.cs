@@ -45,6 +45,8 @@ builder.Services.AddCors(options =>
 #region Interfaces e serviços
 builder.Services.AddScoped<IAdministratorRepository, AdministratorRepository>();
 builder.Services.AddScoped<ISizeRepository, SizeRepository>();
+builder.Services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
+
 
 #endregion
 
