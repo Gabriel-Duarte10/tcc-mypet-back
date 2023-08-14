@@ -5,7 +5,7 @@ using tcc_mypet_back.Data.Request;
 
 namespace tcc_mypet_back.Controllers
 {
-    [Route("api/administrator")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AdministratorsController : ControllerBase
     {
