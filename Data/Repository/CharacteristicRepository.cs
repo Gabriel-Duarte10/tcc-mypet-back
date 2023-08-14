@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using tcc_mypet_back.Data.Context;
 using tcc_mypet_back.Data.Dtos;
 using tcc_mypet_back.Data.Interfaces;
@@ -26,85 +26,80 @@ namespace tcc_mypet_back.Data.Repositories
         public async Task<IEnumerable<CharacteristicDTO>> GetAllAsync()
         {
             var characteristics = await _context.Characteristics.ToListAsync();
-            return _mapper.Map<List<CharacteristicDTO>>(characteristics);
+            return _mapper.Map<IEnumerable<CharacteristicDTO>>(characteristics);
         }
 
         public async Task<CharacteristicDTO> GetByIdAsync(int id)
         {
             var characteristic = await _context.Characteristics.FindAsync(id);
+            if (characteristic == null)
+            {
+                throw new Exception("Characteristic not found");
+            }
             return _mapper.Map<CharacteristicDTO>(characteristic);
         }
 
         public async Task<CharacteristicDTO> CreateAsync(CharacteristicRequest request)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    var characteristic = _mapper.Map<Characteristic>(request);
-                    characteristic.CreatedAt = DateTime.UtcNow;
-                    _context.Characteristics.Add(characteristic);
-                    await _context.SaveChangesAsync();
+                var characteristic = _mapper.Map<Characteristic>(request);
+                await _context.Characteristics.AddAsync(characteristic);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
-                    transaction.Commit();
-
-                    return _mapper.Map<CharacteristicDTO>(characteristic);
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
+                return _mapper.Map<CharacteristicDTO>(characteristic);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error creating Characteristic.", ex);
             }
         }
 
         public async Task<CharacteristicDTO> UpdateAsync(int id, CharacteristicRequest request)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                try
+                var characteristic = await _context.Characteristics.FindAsync(id);
+                if (characteristic == null)
                 {
-                    var characteristic = await _context.Characteristics.FindAsync(id);
-                    if (characteristic == null)
-                        throw new Exception("Characteristic not found.");
-
-                    _mapper.Map(request, characteristic);
-                    characteristic.UpdatedAt = DateTime.UtcNow;
-
-                    await _context.SaveChangesAsync();
-
-                    transaction.Commit();
-
-                    return _mapper.Map<CharacteristicDTO>(characteristic);
+                    throw new Exception("Characteristic not found");
                 }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
+                _mapper.Map(request, characteristic);
+                _context.Characteristics.Update(characteristic);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return _mapper.Map<CharacteristicDTO>(characteristic);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error updating Characteristic.", ex);
             }
         }
 
         public async Task DeleteAsync(int id)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                try
+                var characteristic = await _context.Characteristics.FindAsync(id);
+                if (characteristic == null)
                 {
-                    var characteristic = await _context.Characteristics.FindAsync(id);
-                    if (characteristic == null)
-                        throw new Exception("Characteristic not found.");
-
-                    _context.Characteristics.Remove(characteristic);
-                    await _context.SaveChangesAsync();
-
-                    transaction.Commit();
+                    throw new Exception("Characteristic not found");
                 }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
+                _context.Characteristics.Remove(characteristic);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Error deleting Characteristic.", ex);
             }
         }
     }
