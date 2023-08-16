@@ -49,8 +49,7 @@ builder.Services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
 builder.Services.AddScoped<ICharacteristicRepository, CharacteristicRepository>();
 builder.Services.AddScoped<IBreedRepository, BreedRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 #endregion
 

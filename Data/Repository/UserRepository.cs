@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using tcc_mypet_back.Extensions;
 
 namespace tcc_mypet_back.Data.Repository
 {
@@ -71,7 +72,7 @@ namespace tcc_mypet_back.Data.Repository
                 {
                     foreach (var file in request.Images)
                     {
-                        var base64Image = ConvertFileToBase64(file);
+                        var base64Image = ImageExtensions.ConvertFileToBase64(file);
                         var userImage = new UserImage
                         {
                             ImageName = file.FileName,
@@ -119,7 +120,7 @@ namespace tcc_mypet_back.Data.Repository
 
                 foreach (var file in request.Images)
                 {
-                    var base64Image = ConvertFileToBase64(file);
+                    var base64Image = ImageExtensions.ConvertFileToBase64(file);
                     var userImage = new UserImage
                     {
                         ImageName = file.FileName,
@@ -162,13 +163,6 @@ namespace tcc_mypet_back.Data.Repository
                 await transaction.RollbackAsync();
                 throw new Exception("Error deleting user.", ex);
             }
-        }
-        private string ConvertFileToBase64(IFormFile file)
-        {
-            using var memoryStream = new MemoryStream();
-            file.CopyTo(memoryStream);
-            var fileBytes = memoryStream.ToArray();
-            return Convert.ToBase64String(fileBytes);
         }
     }
 }
