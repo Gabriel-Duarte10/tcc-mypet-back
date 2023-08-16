@@ -48,6 +48,7 @@ builder.Services.AddScoped<ISizeRepository, SizeRepository>();
 builder.Services.AddScoped<IAnimalTypeRepository, AnimalTypeRepository>();
 builder.Services.AddScoped<ICharacteristicRepository, CharacteristicRepository>();
 builder.Services.AddScoped<IBreedRepository, BreedRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 
