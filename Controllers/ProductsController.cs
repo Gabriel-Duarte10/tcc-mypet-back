@@ -85,5 +85,88 @@ namespace tcc_mypet_back.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpPost("favorite")]
+        public async Task<IActionResult> AddToFavoriteAsync([FromBody] FavoriteProductRequest request)
+        {
+            try
+            {
+                var favorite = await _productRepository.AddToFavoriteAsync(request);
+                return Ok(favorite);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("favorite")]
+        public async Task<IActionResult> RemoveFromFavoritesAsync([FromQuery] int productId, [FromQuery] int userId)
+        {
+            try
+            {
+                await _productRepository.RemoveFromFavoritesAsync(productId, userId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("report")]
+        public async Task<IActionResult> ReportProductAsync([FromBody] ReportedProductRequest request)
+        {
+            try
+            {
+                var report = await _productRepository.ReportProductAsync(request);
+                return Ok(report);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("report")]
+        public async Task<IActionResult> UnreportProductAsync([FromQuery] int productId)
+        {
+            try
+            {
+                await _productRepository.UnreportProductAsync(productId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpGet("favorites")]
+        public async Task<IActionResult> GetAllFavoriteProductsAsync()
+        {
+            try
+            {
+                var favorites = await _productRepository.GetAllFavoriteProductsAsync();
+                return Ok(favorites);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("favorites/{userId}")]
+        public async Task<IActionResult> GetFavoriteProductsByUserIdAsync(int userId)
+        {
+            try
+            {
+                var favorites = await _productRepository.GetFavoriteProductsByUserIdAsync(userId);
+                return Ok(favorites);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

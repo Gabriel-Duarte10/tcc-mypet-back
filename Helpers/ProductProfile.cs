@@ -12,6 +12,10 @@ namespace tcc_mypet_back.Helpers
             CreateMap<Product, ProductDTO>();
             CreateMap<ProductImage, ProductImageDTO>();
             CreateMap<ProductRequest, Product>();
+            CreateMap<FavoriteProduct, FavoriteProductDto>();
+            CreateMap<FavoriteProductRequest, FavoriteProduct>();
+            CreateMap<ReportedProduct, ReportedProductDto>();
+            CreateMap<ReportedProductRequest, ReportedProduct>();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace tcc_mypet_back.Data.Dtos
+﻿using tcc_mypet_back.Data.Models;
+
+namespace tcc_mypet_back.Data.Dtos
 {
     public class ProductDTO
     {
@@ -15,5 +17,15 @@
         public int ProductId { get; set; }
         public string ImageName { get; set; }
         public string Image64 { get; set; }
+    }
+    public class FavoriteProductDto
+    {
+        public int ProductId { get; set; }
+        public int UserId { get; set; }
+    }
+    public class ReportedProductDto
+    {
+        public int ProductId { get; set; }
+        public int Counter { get; set; }
     }
 }

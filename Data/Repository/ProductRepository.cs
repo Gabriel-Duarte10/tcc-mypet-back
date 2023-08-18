@@ -159,7 +159,88 @@ namespace tcc_mypet_back.Data.Repositories
                 throw new Exception("Error deleting product.", ex);
             }
         }
+        public async Task<FavoriteProductDto> AddToFavoriteAsync(FavoriteProductRequest request)
+        {
+            var favorite = await _context.FavoriteProducts
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(f => f.ProductId == request.ProductId && f.UserId == request.UserId);
+            if(favorite != null)
+            {
+                favorite.DeleteAt = null;
+                favorite.UpdatedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                favorite = _mapper.Map<FavoriteProduct>(request);
+                favorite.CreatedAt = DateTime.UtcNow;
+                await _context.FavoriteProducts.AddAsync(favorite);
+            }
+                await _context.SaveChangesAsync();
 
-        
+            return _mapper.Map<FavoriteProductDto>(favorite);
+        }
+
+        public async Task RemoveFromFavoritesAsync(int productId, int userId)
+        {
+            var favorite = await _context.FavoriteProducts
+                            .FirstOrDefaultAsync(f => f.ProductId == productId && f.UserId == userId);
+
+            if (favorite == null)
+                throw new Exception("Favorite product not found.");
+
+            favorite.DeleteAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<ReportedProductDto> ReportProductAsync(ReportedProductRequest request)
+        {
+            var reported = await _context.ReportedProducts
+            .FirstOrDefaultAsync(r => r.ProductId == request.ProductId);
+            
+            if (reported != null)
+            {
+                reported.Counter += 1;
+            }
+            else
+            {
+                reported = new ReportedProduct { ProductId = request.ProductId, Counter = 1 };
+                reported.CreatedAt = DateTime.UtcNow;
+                await _context.ReportedProducts.AddAsync(reported);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ReportedProductDto>(reported);
+        }
+
+        public async Task UnreportProductAsync(int productId)
+        {
+            var reported = await _context.ReportedProducts.FirstOrDefaultAsync(r => r.ProductId == productId);
+
+            if (reported == null)
+                throw new Exception("Reported product not found.");
+
+            reported.Counter -= 1;
+            if(reported.Counter == 0)
+            {
+                _context.ReportedProducts.Remove(reported);
+            }
+            await _context.SaveChangesAsync();
+        }
+        public async Task<List<FavoriteProductDto>> GetAllFavoriteProductsAsync()
+        {
+            var favorites = await _context.FavoriteProducts.ToListAsync();
+            return _mapper.Map<List<FavoriteProductDto>>(favorites);
+        }
+
+        public async Task<List<FavoriteProductDto>> GetFavoriteProductsByUserIdAsync(int userId)
+        {
+            var favorites = await _context.FavoriteProducts
+                            .Where(f => f.UserId == userId)
+                            .ToListAsync();
+
+            return _mapper.Map<List<FavoriteProductDto>>(favorites);
+        }
+
     }
 }
