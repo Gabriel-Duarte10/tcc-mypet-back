@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using tcc_mypet_back.Data.Interfaces;
 using tcc_mypet_back.Data.Request;
@@ -7,13 +10,13 @@ namespace tcc_mypet_back.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class PetsController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
+        private readonly IPetRepository _petRepository;
 
-        public ProductsController(IProductRepository productRepository)
+        public PetsController(IPetRepository petRepository)
         {
-            _productRepository = productRepository;
+            _petRepository = petRepository;
         }
 
         [HttpGet]
@@ -21,8 +24,8 @@ namespace tcc_mypet_back.Controllers
         {
             try
             {
-                var products = await _productRepository.GetAllAsync();
-                return Ok(products);
+                var pets = await _petRepository.GetAllAsync();
+                return Ok(pets);
             }
             catch (Exception ex)
             {
@@ -35,22 +38,21 @@ namespace tcc_mypet_back.Controllers
         {
             try
             {
-                var product = await _productRepository.GetByIdAsync(id);
-                return Ok(product);
+                var pet = await _petRepository.GetByIdAsync(id);
+                return Ok(pet);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
-        
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetProductsByUserIdAsync(int userId)
+        public async Task<IActionResult> GetPetsByUserIdAsync(int userId)
         {
             try
             {
-                var products = await _productRepository.GetProductsByUserIdAsync(userId);
-                return Ok(products);
+                var pets = await _petRepository.GetPetsByUserIdAsync(userId);
+                return Ok(pets);
             }
             catch (Exception ex)
             {
@@ -59,12 +61,12 @@ namespace tcc_mypet_back.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromForm] ProductRequest request)
+        public async Task<IActionResult> CreateAsync([FromForm] PetRequest request)
         {
             try
             {
-                var product = await _productRepository.CreateAsync(request);
-                return Ok(product);
+                var pet = await _petRepository.CreateAsync(request);
+                return Ok(pet);
             }
             catch (Exception ex)
             {
@@ -73,12 +75,12 @@ namespace tcc_mypet_back.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, [FromForm] ProductRequest request)
+        public async Task<IActionResult> UpdateAsync(int id, [FromForm] PetRequest request)
         {
             try
             {
-                var product = await _productRepository.UpdateAsync(id, request);
-                return Ok(product);
+                var pet = await _petRepository.UpdateAsync(id, request);
+                return Ok(pet);
             }
             catch (Exception ex)
             {
@@ -91,7 +93,7 @@ namespace tcc_mypet_back.Controllers
         {
             try
             {
-                await _productRepository.DeleteAsync(id);
+                await _petRepository.DeleteAsync(id);
                 return NoContent();
             }
             catch (Exception ex)
@@ -99,12 +101,13 @@ namespace tcc_mypet_back.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpPost("favorite")]
-        public async Task<IActionResult> AddToFavoriteAsync([FromBody] FavoriteProductRequest request)
+        public async Task<IActionResult> AddToFavoriteAsync([FromBody] FavoritePetRequest request)
         {
             try
             {
-                var favorite = await _productRepository.AddToFavoriteAsync(request);
+                var favorite = await _petRepository.AddToFavoriteAsync(request);
                 return Ok(favorite);
             }
             catch (Exception ex)
@@ -114,11 +117,11 @@ namespace tcc_mypet_back.Controllers
         }
 
         [HttpDelete("favorite")]
-        public async Task<IActionResult> RemoveFromFavoritesAsync([FromQuery] int productId, [FromQuery] int userId)
+        public async Task<IActionResult> RemoveFromFavoritesAsync([FromQuery] int petId, [FromQuery] int userId)
         {
             try
             {
-                await _productRepository.RemoveFromFavoritesAsync(productId, userId);
+                await _petRepository.RemoveFromFavoritesAsync(petId, userId);
                 return NoContent();
             }
             catch (Exception ex)
@@ -128,11 +131,11 @@ namespace tcc_mypet_back.Controllers
         }
 
         [HttpPost("report")]
-        public async Task<IActionResult> ReportProductAsync([FromBody] ReportedProductRequest request)
+        public async Task<IActionResult> ReportPetAsync([FromBody] ReportedPetRequest request)
         {
             try
             {
-                var report = await _productRepository.ReportProductAsync(request);
+                var report = await _petRepository.ReportPetAsync(request);
                 return Ok(report);
             }
             catch (Exception ex)
@@ -142,11 +145,11 @@ namespace tcc_mypet_back.Controllers
         }
 
         [HttpDelete("report")]
-        public async Task<IActionResult> UnreportProductAsync([FromQuery] int productId)
+        public async Task<IActionResult> UnreportPetAsync([FromQuery] int petId)
         {
             try
             {
-                await _productRepository.UnreportProductAsync(productId);
+                await _petRepository.UnreportPetAsync(petId);
                 return NoContent();
             }
             catch (Exception ex)
@@ -154,12 +157,13 @@ namespace tcc_mypet_back.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpGet("favorites")]
-        public async Task<IActionResult> GetAllFavoriteProductsAsync()
+        public async Task<IActionResult> GetAllFavoritePetsAsync()
         {
             try
             {
-                var favorites = await _productRepository.GetAllFavoriteProductsAsync();
+                var favorites = await _petRepository.GetAllFavoritePetsAsync();
                 return Ok(favorites);
             }
             catch (Exception ex)
@@ -169,11 +173,11 @@ namespace tcc_mypet_back.Controllers
         }
 
         [HttpGet("favorites/{userId}")]
-        public async Task<IActionResult> GetFavoriteProductsByUserIdAsync(int userId)
+        public async Task<IActionResult> GetFavoritePetsByUserIdAsync(int userId)
         {
             try
             {
-                var favorites = await _productRepository.GetFavoriteProductsByUserIdAsync(userId);
+                var favorites = await _petRepository.GetFavoritePetsByUserIdAsync(userId);
                 return Ok(favorites);
             }
             catch (Exception ex)
@@ -182,12 +186,12 @@ namespace tcc_mypet_back.Controllers
             }
         }
         [HttpGet("reported/user/{userId}")]
-        public async Task<IActionResult> GetReportedProductsByUserIdAsync(int userId)
+        public async Task<IActionResult> GetReportedPetsByUserIdAsync(int userId)
         {
             try
             {
-                var reportedProducts = await _productRepository.GetReportedProductsByUserIdAsync(userId);
-                return Ok(reportedProducts);
+                var reportedPets = await _petRepository.GetReportedPetsByUserIdAsync(userId);
+                return Ok(reportedPets);
             }
             catch (Exception ex)
             {
@@ -196,18 +200,17 @@ namespace tcc_mypet_back.Controllers
         }
 
         [HttpGet("reported")]
-        public async Task<IActionResult> GetAllReportedProductsAsync()
+        public async Task<IActionResult> GetAllReportedPetsAsync()
         {
             try
             {
-                var reportedProducts = await _productRepository.GetAllReportedProductsAsync();
-                return Ok(reportedProducts);
+                var reportedPets = await _petRepository.GetAllReportedPetsAsync();
+                return Ok(reportedPets);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
-
     }
 }

@@ -7,6 +7,7 @@ namespace tcc_mypet_back.Data.Interfaces
     {
         Task<IEnumerable<ProductDTO>> GetAllAsync();
         Task<ProductDTO> GetByIdAsync(int id);
+        Task<IEnumerable<ProductDTO>> GetProductsByUserIdAsync(int userId);
         Task<ProductDTO> CreateAsync(ProductRequest request);
         Task<ProductDTO> UpdateAsync(int id, ProductRequest request);
         Task DeleteAsync(int id);
@@ -16,6 +17,8 @@ namespace tcc_mypet_back.Data.Interfaces
         Task UnreportProductAsync(int productId);
         Task<List<FavoriteProductDto>> GetAllFavoriteProductsAsync();
         Task<List<FavoriteProductDto>> GetFavoriteProductsByUserIdAsync(int userId);
+        Task<List<ReportedProductDto>> GetReportedProductsByUserIdAsync(int userId);
+        Task<List<ReportedProductDto>> GetAllReportedProductsAsync();
 
     }
 }

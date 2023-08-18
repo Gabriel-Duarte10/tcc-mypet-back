@@ -51,6 +51,24 @@ namespace tcc_mypet_back.Data.Repositories
 
             return productDto;
         }
+        // Dentro da classe ProductRepository
+
+        public async Task<IEnumerable<ProductDTO>> GetProductsByUserIdAsync(int userId)
+        {
+            var products = await _context.Products.Where(p => p.UserId == userId).ToListAsync();
+            var productDtos = _mapper.Map<IEnumerable<ProductDTO>>(products);
+
+            var productImages = await _context.ProductImages.ToListAsync();
+            var productImageDtos = _mapper.Map<List<ProductImageDTO>>(productImages);
+
+            foreach (var product in productDtos)
+            {
+                product.ProductImages = productImageDtos.Where(pi => pi.ProductId == product.Id).ToList();
+            }
+
+            return productDtos;
+        }
+
 
         public async Task<ProductDTO> CreateAsync(ProductRequest request)
         {
@@ -240,6 +258,21 @@ namespace tcc_mypet_back.Data.Repositories
                             .ToListAsync();
 
             return _mapper.Map<List<FavoriteProductDto>>(favorites);
+        }
+        public async Task<List<ReportedProductDto>> GetReportedProductsByUserIdAsync(int userId)
+        {
+            var reportedProducts = await _context.ReportedProducts
+                .Include(x => x.Product)
+                .Where(rp => rp.Product.UserId == userId)
+                .ToListAsync();
+
+            return _mapper.Map<List<ReportedProductDto>>(reportedProducts);
+        }
+
+        public async Task<List<ReportedProductDto>> GetAllReportedProductsAsync()
+        {
+            var reportedProducts = await _context.ReportedProducts.ToListAsync();
+            return _mapper.Map<List<ReportedProductDto>>(reportedProducts);
         }
 
     }
