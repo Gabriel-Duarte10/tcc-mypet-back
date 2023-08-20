@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tcc_mypet_back.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrations : Migration
+    public partial class ChatSession : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -278,38 +278,36 @@ namespace tcc_mypet_back.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserProductChats",
+                name: "UserProductChatSessions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SenderUserId = table.Column<int>(type: "int", nullable: false),
-                    ReceiverUserId = table.Column<int>(type: "int", nullable: false),
+                    User1Id = table.Column<int>(type: "int", nullable: false),
+                    User2Id = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image64 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserProductChats", x => x.Id);
+                    table.PrimaryKey("PK_UserProductChatSessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserProductChats_Products_ProductId",
+                        name: "FK_UserProductChatSessions_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserProductChats_Users_ReceiverUserId",
-                        column: x => x.ReceiverUserId,
+                        name: "FK_UserProductChatSessions_Users_User1Id",
+                        column: x => x.User1Id,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserProductChats_Users_SenderUserId",
-                        column: x => x.SenderUserId,
+                        name: "FK_UserProductChatSessions_Users_User2Id",
+                        column: x => x.User2Id,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -364,6 +362,37 @@ namespace tcc_mypet_back.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserProductChats",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserProductChatSessionId = table.Column<int>(type: "int", nullable: false),
+                    SenderUserId = table.Column<int>(type: "int", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProductChats", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserProductChats_UserProductChatSessions_UserProductChatSessionId",
+                        column: x => x.UserProductChatSessionId,
+                        principalTable: "UserProductChatSessions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserProductChats_Users_SenderUserId",
+                        column: x => x.SenderUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -443,16 +472,51 @@ namespace tcc_mypet_back.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserPetChatSessions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    User1Id = table.Column<int>(type: "int", nullable: false),
+                    User2Id = table.Column<int>(type: "int", nullable: false),
+                    PetId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPetChatSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserPetChatSessions_Pets_PetId",
+                        column: x => x.PetId,
+                        principalTable: "Pets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserPetChatSessions_Users_User1Id",
+                        column: x => x.User1Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserPetChatSessions_Users_User2Id",
+                        column: x => x.User2Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserPetChats",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    UserPetChatSessionId = table.Column<int>(type: "int", nullable: false),
                     SenderUserId = table.Column<int>(type: "int", nullable: false),
-                    ReceiverUserId = table.Column<int>(type: "int", nullable: false),
-                    PetId = table.Column<int>(type: "int", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image64 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -461,15 +525,9 @@ namespace tcc_mypet_back.Migrations
                 {
                     table.PrimaryKey("PK_UserPetChats", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserPetChats_Pets_PetId",
-                        column: x => x.PetId,
-                        principalTable: "Pets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserPetChats_Users_ReceiverUserId",
-                        column: x => x.ReceiverUserId,
-                        principalTable: "Users",
+                        name: "FK_UserPetChats_UserPetChatSessions_UserPetChatSessionId",
+                        column: x => x.UserPetChatSessionId,
+                        principalTable: "UserPetChatSessions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -576,34 +634,54 @@ namespace tcc_mypet_back.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPetChats_PetId",
-                table: "UserPetChats",
-                column: "PetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserPetChats_ReceiverUserId",
-                table: "UserPetChats",
-                column: "ReceiverUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserPetChats_SenderUserId",
                 table: "UserPetChats",
                 column: "SenderUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserProductChats_ProductId",
-                table: "UserProductChats",
-                column: "ProductId");
+                name: "IX_UserPetChats_UserPetChatSessionId",
+                table: "UserPetChats",
+                column: "UserPetChatSessionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserProductChats_ReceiverUserId",
-                table: "UserProductChats",
-                column: "ReceiverUserId");
+                name: "IX_UserPetChatSessions_PetId",
+                table: "UserPetChatSessions",
+                column: "PetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPetChatSessions_User1Id",
+                table: "UserPetChatSessions",
+                column: "User1Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPetChatSessions_User2Id",
+                table: "UserPetChatSessions",
+                column: "User2Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserProductChats_SenderUserId",
                 table: "UserProductChats",
                 column: "SenderUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProductChats_UserProductChatSessionId",
+                table: "UserProductChats",
+                column: "UserProductChatSessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProductChatSessions_ProductId",
+                table: "UserProductChatSessions",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProductChatSessions_User1Id",
+                table: "UserProductChatSessions",
+                column: "User1Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProductChatSessions_User2Id",
+                table: "UserProductChatSessions",
+                column: "User2Id");
         }
 
         /// <inheritdoc />
@@ -635,6 +713,12 @@ namespace tcc_mypet_back.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserProductChats");
+
+            migrationBuilder.DropTable(
+                name: "UserPetChatSessions");
+
+            migrationBuilder.DropTable(
+                name: "UserProductChatSessions");
 
             migrationBuilder.DropTable(
                 name: "Pets");

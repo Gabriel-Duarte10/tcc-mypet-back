@@ -5,6 +5,7 @@ using tcc_mypet_back.Data.Context;
 using tcc_mypet_back.Data.Interfaces;
 using tcc_mypet_back.Data.Repositories;
 using tcc_mypet_back.Data.Repository;
+using tcc_mypet_back.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,12 +100,20 @@ app.UseSwaggerUI(c =>
     c.EnableValidator();
 });
 
+app.UseWebSockets();
+
+app.Map("/chat", appBuilder =>
+{
+    appBuilder.UseMiddleware<ChatWebSocketService>();
+});
+
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
 
 app.UseHangfireServer();
 app.UseHangfireDashboard();

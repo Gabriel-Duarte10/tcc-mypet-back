@@ -29,6 +29,8 @@ namespace tcc_mypet_back.Data.Context
         public DbSet<Characteristic> Characteristics { get; set; }
         public DbSet<UserPetChat> UserPetChats { get; set; }
         public DbSet<UserProductChat> UserProductChats { get; set; }
+        public DbSet<UserPetChatSession> UserPetChatSessions { get; set; }
+        public DbSet<UserProductChatSession> UserProductChatSessions { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -91,28 +93,83 @@ namespace tcc_mypet_back.Data.Context
             // UserPetChat
             modelBuilder.Entity<UserPetChat>()
                 .HasOne(upc => upc.SenderUser)
-                .WithMany()
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<UserPetChat>()
-                .HasOne(upc => upc.ReceiverUser)
-                .WithMany()
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<UserPetChat>()
-                .HasOne(upc => upc.Pet)
                 .WithMany();
-
+            modelBuilder.Entity<UserPetChat>()
+                .HasOne(upc => upc.UserPetChatSession)
+                .WithMany();
+            modelBuilder.Entity<UserPetChat>()
+                .HasOne(upc => upc.SenderUser)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserPetChat>()
+                .HasOne(upc => upc.UserPetChatSession)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
             // UserProductChat
+            modelBuilder.Entity<UserProductChat>()
+                .HasOne(upc => upc.SenderUser)
+                .WithMany();
+            modelBuilder.Entity<UserProductChat>()
+                .HasOne(upc => upc.UserProductChatSession)
+                .WithMany();
             modelBuilder.Entity<UserProductChat>()
                 .HasOne(upc => upc.SenderUser)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<UserProductChat>()
-                .HasOne(upc => upc.ReceiverUser)
+                .HasOne(upc => upc.UserProductChatSession)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<UserProductChat>()
+            
+            // UserPetChatSession
+            modelBuilder.Entity<UserPetChatSession>()
+                .HasOne(upc => upc.Pet)
+                .WithMany();
+             modelBuilder.Entity<UserPetChatSession>()
+                .HasOne(upc => upc.User2)
+                .WithMany();
+            modelBuilder.Entity<UserPetChatSession>()
+                .HasOne(upc => upc.User1)
+                .WithMany();
+
+            // UserProductChatSession
+            modelBuilder.Entity<UserProductChatSession>()
                 .HasOne(upc => upc.Product)
                 .WithMany();
+             modelBuilder.Entity<UserProductChatSession>()
+                .HasOne(upc => upc.User2)
+                .WithMany();
+            modelBuilder.Entity<UserProductChatSession>()
+                .HasOne(upc => upc.User1)
+                .WithMany();
+
+            // UserPetChatSession
+            modelBuilder.Entity<UserPetChatSession>()
+                .HasOne(upc => upc.Pet)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+             modelBuilder.Entity<UserPetChatSession>()
+                .HasOne(upc => upc.User2)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+             modelBuilder.Entity<UserPetChatSession>()
+                .HasOne(upc => upc.User1)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // UserPetChatSession
+            modelBuilder.Entity<UserProductChatSession>()
+                .HasOne(upc => upc.Product)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserProductChatSession>()
+                .HasOne(upc => upc.User1)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserProductChatSession>()
+                .HasOne(upc => upc.User2)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
 
             // FavoriteProducts
             modelBuilder.Entity<FavoriteProduct>()

@@ -592,34 +592,64 @@ namespace tcc_mypet_back.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Image64")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReceiverUserId")
-                        .HasColumnType("int");
 
                     b.Property<int>("SenderUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("UserPetChatSessionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderUserId");
+
+                    b.HasIndex("UserPetChatSessionId");
+
+                    b.ToTable("UserPetChats");
+                });
+
+            modelBuilder.Entity("tcc_mypet_back.Data.Models.UserPetChatSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeleteAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("User1Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("User2Id")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PetId");
 
-                    b.HasIndex("ReceiverUserId");
+                    b.HasIndex("User1Id");
 
-                    b.HasIndex("SenderUserId");
+                    b.HasIndex("User2Id");
 
-                    b.ToTable("UserPetChats");
+                    b.ToTable("UserPetChatSessions");
                 });
 
             modelBuilder.Entity("tcc_mypet_back.Data.Models.UserProductChat", b =>
@@ -637,34 +667,64 @@ namespace tcc_mypet_back.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Image64")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReceiverUserId")
-                        .HasColumnType("int");
 
                     b.Property<int>("SenderUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("UserProductChatSessionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderUserId");
+
+                    b.HasIndex("UserProductChatSessionId");
+
+                    b.ToTable("UserProductChats");
+                });
+
+            modelBuilder.Entity("tcc_mypet_back.Data.Models.UserProductChatSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeleteAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("User1Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("User2Id")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("ReceiverUserId");
+                    b.HasIndex("User1Id");
 
-                    b.HasIndex("SenderUserId");
+                    b.HasIndex("User2Id");
 
-                    b.ToTable("UserProductChats");
+                    b.ToTable("UserProductChatSessions");
                 });
 
             modelBuilder.Entity("tcc_mypet_back.Data.Models.AnimalType", b =>
@@ -860,56 +920,94 @@ namespace tcc_mypet_back.Migrations
 
             modelBuilder.Entity("tcc_mypet_back.Data.Models.UserPetChat", b =>
                 {
-                    b.HasOne("tcc_mypet_back.Data.Models.Pet", "Pet")
-                        .WithMany()
-                        .HasForeignKey("PetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("tcc_mypet_back.Data.Models.User", "ReceiverUser")
-                        .WithMany()
-                        .HasForeignKey("ReceiverUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("tcc_mypet_back.Data.Models.User", "SenderUser")
                         .WithMany()
                         .HasForeignKey("SenderUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("tcc_mypet_back.Data.Models.UserPetChatSession", "UserPetChatSession")
+                        .WithMany()
+                        .HasForeignKey("UserPetChatSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SenderUser");
+
+                    b.Navigation("UserPetChatSession");
+                });
+
+            modelBuilder.Entity("tcc_mypet_back.Data.Models.UserPetChatSession", b =>
+                {
+                    b.HasOne("tcc_mypet_back.Data.Models.Pet", "Pet")
+                        .WithMany()
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("tcc_mypet_back.Data.Models.User", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("tcc_mypet_back.Data.Models.User", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Pet");
 
-                    b.Navigation("ReceiverUser");
+                    b.Navigation("User1");
 
-                    b.Navigation("SenderUser");
+                    b.Navigation("User2");
                 });
 
             modelBuilder.Entity("tcc_mypet_back.Data.Models.UserProductChat", b =>
                 {
-                    b.HasOne("tcc_mypet_back.Data.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("tcc_mypet_back.Data.Models.User", "ReceiverUser")
-                        .WithMany()
-                        .HasForeignKey("ReceiverUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("tcc_mypet_back.Data.Models.User", "SenderUser")
                         .WithMany()
                         .HasForeignKey("SenderUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Product");
-
-                    b.Navigation("ReceiverUser");
+                    b.HasOne("tcc_mypet_back.Data.Models.UserProductChatSession", "UserProductChatSession")
+                        .WithMany()
+                        .HasForeignKey("UserProductChatSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("SenderUser");
+
+                    b.Navigation("UserProductChatSession");
+                });
+
+            modelBuilder.Entity("tcc_mypet_back.Data.Models.UserProductChatSession", b =>
+                {
+                    b.HasOne("tcc_mypet_back.Data.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("tcc_mypet_back.Data.Models.User", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("tcc_mypet_back.Data.Models.User", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
                 });
 #pragma warning restore 612, 618
         }
