@@ -52,6 +52,8 @@ builder.Services.AddScoped<IBreedRepository, BreedRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IPetRepository, PetRepository>();
+builder.Services.AddScoped<IUserPetChatRepository, UserPetChatRepository>();
+builder.Services.AddScoped<IUserProductChatRepository, UserProductChatRepository>();
 
 #endregion
 
