@@ -17,6 +17,7 @@ namespace tcc_mypet_back.Data.Models
         public string State { get; set; }
         public string City { get; set; }
         public bool IsActive { get; set; }
+        public int? CellphoneCode { get; set; }
     }
 
 }

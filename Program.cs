@@ -9,6 +9,7 @@ using tcc_mypet_back.Data.Dtos;
 using tcc_mypet_back.Data.Interfaces;
 using tcc_mypet_back.Data.Repositories;
 using tcc_mypet_back.Data.Repository;
+using tcc_mypet_back.Data.Request;
 using tcc_mypet_back.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +60,10 @@ builder.Services.AddScoped<IPetRepository, PetRepository>();
 builder.Services.AddScoped<IUserPetChatRepository, UserPetChatRepository>();
 builder.Services.AddScoped<IUserProductChatRepository, UserProductChatRepository>();
 builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
+var twilioSettings = builder.Configuration.GetSection("Twilio").Get<TwilioSettings>();
+builder.Services.AddSingleton(new SMSService(twilioSettings.AccountSID, twilioSettings.AuthToken, twilioSettings.PhoneNumber));
+
 
 #endregion
 #region JWT

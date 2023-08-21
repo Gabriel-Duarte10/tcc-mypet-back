@@ -34,6 +34,9 @@ namespace tcc_mypet_back.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CellphoneCode")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -497,6 +500,9 @@ namespace tcc_mypet_back.Migrations
                     b.Property<string>("Cellphone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CellphoneCode")
+                        .HasColumnType("int");
 
                     b.Property<string>("City")
                         .IsRequired()

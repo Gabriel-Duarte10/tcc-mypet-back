@@ -13,10 +13,12 @@ namespace tcc_mypet_back.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthenticationRepository _repository;
+        private readonly IPasswordResetRepository _passwordRepository;
 
-        public AuthController(IAuthenticationRepository repository)
+        public AuthController(IAuthenticationRepository repository, IPasswordResetRepository passwordResetRepository)
         {
             _repository = repository;
+            _passwordRepository = passwordResetRepository;
         }
 
         [HttpPost("LoginAdmin")]
@@ -48,5 +50,62 @@ namespace tcc_mypet_back.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("InitiateResetUser")]
+        public async Task<IActionResult> InitiateReset([FromBody] ResetPasswordInitiateRequest request)
+        {
+            try 
+            {
+                await _passwordRepository.GenerateAndSaveCellphoneCodeForUserAsync(request.Email);
+                return Ok("Verification code sent to the registered cellphone.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("CompleteResetUser")]
+        public async Task<IActionResult> CompleteReset([FromBody] ResetPasswordCompleteRequest request)
+        {
+            try 
+            {
+                if (request.NewPassword != request.ConfirmNewPassword) return BadRequest("Passwords do not match.");
+                await _passwordRepository.ValidateAndResetPasswordForUserAsync(request.Email, request.NewPassword, request.CellphoneCode);
+                return Ok("Password successfully reset.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("InitiateResetAdmin")]
+        public async Task<IActionResult> InitiateResetAdmin([FromBody] ResetPasswordInitiateRequest request)
+        {
+            try 
+            {
+                await _passwordRepository.GenerateAndSaveCellphoneCodeForAdminAsync(request.Email);
+                return Ok("Verification code sent to the registered cellphone.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("CompleteResetAdmin")]
+        public async Task<IActionResult> CompleteResetAdmin([FromBody] ResetPasswordCompleteRequest request)
+        {
+            try 
+            {
+                if (request.NewPassword != request.ConfirmNewPassword) return BadRequest("Passwords do not match.");
+                await _passwordRepository.ValidateAndResetPasswordForAdminAsync(request.Email, request.NewPassword, request.CellphoneCode);
+                return Ok("Password successfully reset.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

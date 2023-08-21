@@ -11,5 +11,6 @@ namespace tcc_mypet_back.Data.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string Cellphone { get; set; }
+        public int? CellphoneCode { get; set; }
     }
 }
