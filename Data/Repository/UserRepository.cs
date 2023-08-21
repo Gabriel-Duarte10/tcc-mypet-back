@@ -58,6 +58,9 @@ namespace tcc_mypet_back.Data.Repository
 
             try
             {
+                if(await _context.Users.AnyAsync(u => u.Email == request.Email))
+                    throw new Exception("Email already in use.");
+                    
                 var user = _mapper.Map<User>(request);
                 user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
 

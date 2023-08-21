@@ -5,9 +5,11 @@ using tcc_mypet_back.Data.Request;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace tcc_mypet_back.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -37,7 +39,7 @@ namespace tcc_mypet_back.Controllers
                 return NotFound(e.Message);
             }
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<UserDto>> Create([FromForm] UserCreateRequest request)
         {

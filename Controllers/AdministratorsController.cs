@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using tcc_mypet_back.Data.Interfaces;
 using tcc_mypet_back.Data.Request;
 
 namespace tcc_mypet_back.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     [Route("api/[controller]")]
     [ApiController]
     public class AdministratorsController : ControllerBase
@@ -43,7 +45,7 @@ namespace tcc_mypet_back.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] AdministratorRequest request)
         {

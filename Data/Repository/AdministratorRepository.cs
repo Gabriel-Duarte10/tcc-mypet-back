@@ -38,7 +38,11 @@ namespace tcc_mypet_back.Data.Repository
 
             try
             {
+                if(await _context.Set<Administrator>().AnyAsync(a => a.Email == request.Email))
+                    throw new Exception("Email already in use.");
+
                 var administrator = _mapper.Map<Administrator>(request);
+                administrator.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
                 administrator.CreatedAt = DateTime.UtcNow;
                 _context.Set<Administrator>().Add(administrator);
                 await _context.SaveChangesAsync();

@@ -1,7 +1,11 @@
+using System.Text;
 using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using tcc_mypet_back.Data.Context;
+using tcc_mypet_back.Data.Dtos;
 using tcc_mypet_back.Data.Interfaces;
 using tcc_mypet_back.Data.Repositories;
 using tcc_mypet_back.Data.Repository;
@@ -54,6 +58,31 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IPetRepository, PetRepository>();
 builder.Services.AddScoped<IUserPetChatRepository, UserPetChatRepository>();
 builder.Services.AddScoped<IUserProductChatRepository, UserProductChatRepository>();
+builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+
+#endregion
+#region JWT
+
+var jwtSettings = new JwtSettingsDTO();
+builder.Configuration.Bind("JWT", jwtSettings);
+
+builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecurityKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 #endregion
 
@@ -108,6 +137,7 @@ app.Map("/chat", appBuilder =>
 {
     appBuilder.UseMiddleware<ChatWebSocketService>();
 });
+app.UseAuthentication();
 
 app.UseAuthorization();
 

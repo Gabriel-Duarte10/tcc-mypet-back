@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using tcc_mypet_back.Data.Interfaces;
@@ -6,6 +7,7 @@ using tcc_mypet_back.Data.Request;
 
 namespace tcc_mypet_back.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     [ApiController]
     [Route("api/[controller]")]
     public class SizesController : ControllerBase
