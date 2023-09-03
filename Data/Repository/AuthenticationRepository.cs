@@ -74,9 +74,10 @@ namespace tcc_mypet_back.Data.Repository
                 Subject = new ClaimsIdentity(new Claim[] 
                 {
                     new Claim(ClaimTypes.NameIdentifier, admin.Id.ToString()),
+                    new Claim("name", admin.Name),
                     new Claim(ClaimTypes.Email, admin.Email),
                     new Claim(ClaimTypes.Role, "Administrator"),
-                    new Claim(ClaimTypes.MobilePhone, admin.Cellphone)
+                    new Claim("cellphone", admin.Cellphone)
                 }),
                 Expires = DateTime.UtcNow.AddHours(_jwtSettings.HoursExpire),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

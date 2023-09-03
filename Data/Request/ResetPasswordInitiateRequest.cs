@@ -9,12 +9,16 @@ namespace tcc_mypet_back.Data.Request
     {
         public string Email { get; set; }
     }
+    public class CodePassword
+    {
+        public string Email { get; set; }
+        public int CellphoneCode { get; set; }
+    }
 
     public class ResetPasswordCompleteRequest
     {
         public string Email { get; set; }
         public string NewPassword { get; set; }
         public string ConfirmNewPassword { get; set; }
-        public int CellphoneCode { get; set; }
     }
 }

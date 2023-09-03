@@ -32,7 +32,7 @@ namespace tcc_mypet_back.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -47,7 +47,7 @@ namespace tcc_mypet_back.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
         [HttpPost("InitiateResetUser")]
@@ -55,12 +55,12 @@ namespace tcc_mypet_back.Controllers
         {
             try 
             {
-                await _passwordRepository.GenerateAndSaveCellphoneCodeForUserAsync(request.Email);
-                return Ok("Verification code sent to the registered cellphone.");
+                var cellphone = await _passwordRepository.GenerateAndSaveCellphoneCodeForUserAsync(request.Email);
+                return Ok(cellphone);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -70,12 +70,12 @@ namespace tcc_mypet_back.Controllers
             try 
             {
                 if (request.NewPassword != request.ConfirmNewPassword) return BadRequest("Passwords do not match.");
-                await _passwordRepository.ValidateAndResetPasswordForUserAsync(request.Email, request.NewPassword, request.CellphoneCode);
-                return Ok("Password successfully reset.");
+                await _passwordRepository.ResetPasswordForUserAsync(request.Email, request.NewPassword);
+                return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
         [HttpPost("InitiateResetAdmin")]
@@ -83,12 +83,12 @@ namespace tcc_mypet_back.Controllers
         {
             try 
             {
-                await _passwordRepository.GenerateAndSaveCellphoneCodeForAdminAsync(request.Email);
-                return Ok("Verification code sent to the registered cellphone.");
+                var cellphone = await _passwordRepository.GenerateAndSaveCellphoneCodeForAdminAsync(request.Email);
+                return Ok(cellphone);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -98,12 +98,38 @@ namespace tcc_mypet_back.Controllers
             try 
             {
                 if (request.NewPassword != request.ConfirmNewPassword) return BadRequest("Passwords do not match.");
-                await _passwordRepository.ValidateAndResetPasswordForAdminAsync(request.Email, request.NewPassword, request.CellphoneCode);
-                return Ok("Password successfully reset.");
+                await _passwordRepository.ResetPasswordForAdminAsync(request.Email, request.NewPassword);
+                return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPost("ValidateCodeUser")]
+        public async Task<IActionResult> ValidateCodeUser([FromBody] CodePassword request)
+        {
+            try 
+            {
+                await _passwordRepository.ValidateCodeForUserAsync(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPost("ValidateCodeAdmin")]
+        public async Task<IActionResult> ValidateCodeAdmin([FromBody] CodePassword request)
+        {
+            try 
+            {
+                await _passwordRepository.ValidateCodeForAdminAsync(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 

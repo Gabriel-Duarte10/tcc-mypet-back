@@ -53,7 +53,7 @@ namespace tcc_mypet_back.Data.Repository
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw new Exception("Error creating administrator.", ex);
+                throw;
             }
         }
 
@@ -76,7 +76,7 @@ namespace tcc_mypet_back.Data.Repository
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw new Exception("Error updating administrator.", ex);
+                throw ;
             }
         }
 
@@ -96,7 +96,7 @@ namespace tcc_mypet_back.Data.Repository
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw new Exception("Error deleting administrator.", ex);
+                throw;
             }
         }
     }
