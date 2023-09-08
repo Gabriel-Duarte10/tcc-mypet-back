@@ -25,13 +25,13 @@ namespace tcc_mypet_back.Data.Repositories
 
         public async Task<IEnumerable<BreedDTO>> GetAllAsync()
         {
-            var breeds = await _context.Breeds.ToListAsync();
+            var breeds = await _context.Breeds.Include(x => x.AnimalType).ToListAsync();
             return _mapper.Map<IEnumerable<BreedDTO>>(breeds);
         }
 
         public async Task<BreedDTO> GetByIdAsync(int id)
         {
-            var breed = await _context.Breeds.FindAsync(id);
+            var breed = await _context.Breeds.Include(x => x.AnimalType).FirstOrDefaultAsync(x => x.Id == id);
             if (breed == null)
             {
                 throw new Exception("Breed not found");

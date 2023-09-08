@@ -107,6 +107,9 @@ builder.Services.AddHttpsRedirection(options =>
 #endregion
 var app = builder.Build();
 
+// Inicialização do banco de dados
+var DataContext = app.Services.CreateScope().ServiceProvider.GetService<DataContext>();
+DatabaseInitializer.Initialize(DataContext);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

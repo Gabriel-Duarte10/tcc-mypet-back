@@ -4,7 +4,6 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int AdministratorId { get; set; }
-        public int AnimalTypeId { get; set; }
+        public AnimalTypeDTO AnimalType { get; set; }
     }
 }
