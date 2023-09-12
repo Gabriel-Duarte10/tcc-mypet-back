@@ -21,7 +21,7 @@ namespace tcc_mypet_back.Data.Dtos
         public int CharacteristicId { get; set; }
         public int BreedId { get; set; }
         public int SizeId { get; set; }
-        public int UserId { get; set; }
+        public UserDto User { get; set; }
 
         // For Images
         public List<PetImageDTO> PetImages { get; set; }

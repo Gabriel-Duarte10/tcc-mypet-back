@@ -9,7 +9,7 @@ using tcc_mypet_back.Data.Request;
 
 namespace tcc_mypet_back.Controllers
 {
-    [Authorize]
+    //[[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserProductChatController : ControllerBase

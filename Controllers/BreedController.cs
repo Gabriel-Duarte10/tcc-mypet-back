@@ -6,7 +6,7 @@ using tcc_mypet_back.Data.Request;
 
 namespace tcc_mypet_back.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Administrator")]
     [Route("api/[controller]")]
     [ApiController]
     public class BreedsController : ControllerBase

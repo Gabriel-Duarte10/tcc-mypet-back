@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace tcc_mypet_back.Controllers
 {
-    [Authorize]
+    //[[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase

@@ -12,8 +12,8 @@ using tcc_mypet_back.Data.Context;
 namespace tcc_mypet_back.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230821011006_Initial")]
-    partial class Initial
+    [Migration("20230912034732_Inital")]
+    partial class Inital
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -523,6 +523,12 @@ namespace tcc_mypet_back.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()

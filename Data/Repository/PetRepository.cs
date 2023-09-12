@@ -26,7 +26,7 @@ namespace tcc_mypet_back.Data.Repository
 
         public async Task<IEnumerable<PetDTO>> GetAllAsync()
         {
-            var pets = await _context.Pets.ToListAsync();
+            var pets = await _context.Pets.Include(x => x.User).ToListAsync();
             var petDtos = _mapper.Map<IEnumerable<PetDTO>>(pets);
 
             var petImages = await _context.PetImages.ToListAsync();
@@ -42,7 +42,7 @@ namespace tcc_mypet_back.Data.Repository
 
         public async Task<PetDTO> GetByIdAsync(int id)
         {
-            var pet = await _context.Pets.FirstOrDefaultAsync(p => p.Id == id);
+            var pet = await _context.Pets.Include(x => x.User).FirstOrDefaultAsync(p => p.Id == id);
             if (pet == null) throw new Exception("Pet not found.");
 
             var petImages = await _context.PetImages.Where(pi => pi.PetId == pet.Id).ToListAsync();
@@ -55,7 +55,7 @@ namespace tcc_mypet_back.Data.Repository
 
         public async Task<IEnumerable<PetDTO>> GetPetsByUserIdAsync(int userId)
         {
-            var pets = await _context.Pets.Where(p => p.UserId == userId).ToListAsync();
+            var pets = await _context.Pets.Include(x => x.User).Where(p => p.UserId == userId).ToListAsync();
             var petDtos = _mapper.Map<IEnumerable<PetDTO>>(pets);
 
             var petImages = await _context.PetImages.ToListAsync();

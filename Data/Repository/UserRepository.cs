@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tcc_mypet_back.Extensions;
+using tcc_mypet_back.Services;
 
 namespace tcc_mypet_back.Data.Repository
 {
@@ -17,11 +18,15 @@ namespace tcc_mypet_back.Data.Repository
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IConfiguration configuration;
+        private string ApiKeyGoogle = "";
 
-        public UserRepository(DataContext context, IMapper mapper)
+        public UserRepository(DataContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            this.configuration = configuration;
+            ApiKeyGoogle = this.configuration["Google:KeyGeocoding"] ?? "";
         }
 
         public async Task<IEnumerable<UserDto>> GetAllAsync()
@@ -64,6 +69,13 @@ namespace tcc_mypet_back.Data.Repository
                 var user = _mapper.Map<User>(request);
                 user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
+                // Obtendo a latitude e longitude usando a classe auxiliar
+                string fullAddress = $"{request.Street}, {request.Number}, {request.City}, {request.State}, {request.ZipCode}";
+                var geocodingHelper = new GeocodingHelper(configuration["GoogleMaps:KeyGeocoding"] ?? ""); // Supondo que sua chave da API está em appsettings sob "GoogleMaps:ApiKey"
+                var (latitude, longitude) = await geocodingHelper.GetLatLongFromAddress(fullAddress);
+                user.Latitude = latitude;
+                user.Longitude = longitude;
+
                 if (request.Images != null && request.Images.Count > 3)
                     throw new Exception("Cannot attach more than 3 images.");
 
@@ -97,6 +109,7 @@ namespace tcc_mypet_back.Data.Repository
                 throw new Exception("Error creating user.", ex);
             }
         }
+
 
         public async Task<UserDto> UpdateAsync(int id, UserUpdateRequest request)
         {
