@@ -16,8 +16,10 @@ namespace tcc_mypet_back.Data.Dtos
         public bool IsNeutered { get; set; }
         public bool IsVaccinated { get; set; }
         public bool AdoptionStatus { get; set; }
+        public virtual DateTime? CreatedAt { get; set; }
 
         // Foreign Keys
+        public int AnimalTypeId { get; set; }
         public int CharacteristicId { get; set; }
         public int BreedId { get; set; }
         public int SizeId { get; set; }

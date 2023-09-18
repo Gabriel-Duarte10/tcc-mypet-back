@@ -13,7 +13,9 @@ namespace tcc_mypet_back.Helpers
     {
         public PetProfile()
         {
-            CreateMap<Pet, PetDTO>().ReverseMap();
+            CreateMap<Pet, PetDTO>()
+            .ForMember(dest => dest.AnimalTypeId, opt => opt.MapFrom(src => src.Breed.AnimalTypeId))
+            .ReverseMap();
             CreateMap<PetImage, PetImageDTO>().ReverseMap();
             CreateMap<FavoritePet, FavoritePetDto>().ReverseMap();
             CreateMap<ReportedPet, ReportedPetDto>().ReverseMap();
