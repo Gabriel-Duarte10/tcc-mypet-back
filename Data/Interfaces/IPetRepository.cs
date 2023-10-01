@@ -6,6 +6,7 @@ namespace tcc_mypet_back.Data.Interfaces
     public interface IPetRepository
     {
         Task<IEnumerable<PetDTO>> GetAllAsync();
+        Task<List<PetDTO>> GetFilteredPetsAsync(FilterModel filters);
         Task<PetDTO> GetByIdAsync(int id);
         Task<IEnumerable<PetDTO>> GetPetsByUserIdAsync(int userId);
         Task<PetDTO> CreateAsync(PetRequest request);

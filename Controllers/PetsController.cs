@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using tcc_mypet_back.Data.Interfaces;
 using tcc_mypet_back.Data.Request;
+using OfficeOpenXml;
+using System.IO;
+using tcc_mypet_back.Data.Dtos;
 
 namespace tcc_mypet_back.Controllers
 {
@@ -213,6 +216,80 @@ namespace tcc_mypet_back.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [HttpPost("export-to-excel")]
+        public async Task<IActionResult> ExportToExcel([FromBody] FilterModel filters)
+        {
+            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            // Aqui você aplicaria os filtros e obteria os dados
+            var pets = await _petRepository.GetFilteredPetsAsync(filters);
+
+            // Criar o pacote Excel
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Pets");
+
+            // Adicionar cabeçalhos
+            int col = 1;
+            worksheet.Cells[1, col++].Value = "ID";
+            worksheet.Cells[1, col++].Value = "Name";
+            worksheet.Cells[1, col++].Value = "BirthMonth";
+            worksheet.Cells[1, col++].Value = "BirthYear";
+            worksheet.Cells[1, col++].Value = "Gender";
+            worksheet.Cells[1, col++].Value = "Description";
+            worksheet.Cells[1, col++].Value = "IsNeutered";
+            worksheet.Cells[1, col++].Value = "IsVaccinated";
+            worksheet.Cells[1, col++].Value = "AdoptionStatus";
+            worksheet.Cells[1, col++].Value = "CreatedAt";
+
+            // Adicionando cabeçalhos do UserDto
+            worksheet.Cells[1, col++].Value = "UserID";
+            worksheet.Cells[1, col++].Value = "UserName";
+            worksheet.Cells[1, col++].Value = "Cellphone";
+            worksheet.Cells[1, col++].Value = "ZipCode";
+            worksheet.Cells[1, col++].Value = "Street";
+            worksheet.Cells[1, col++].Value = "Number";
+            worksheet.Cells[1, col++].Value = "State";
+            worksheet.Cells[1, col++].Value = "City";
+            worksheet.Cells[1, col++].Value = "Longitude";
+            worksheet.Cells[1, col++].Value = "Latitude";
+
+            // Adicionar dados
+            for (int i = 0; i < pets.Count; i++)
+            {
+                var pet = pets[i];
+                col = 1;
+                worksheet.Cells[i + 2, col++].Value = pet.Id;
+                worksheet.Cells[i + 2, col++].Value = pet.Name;
+                worksheet.Cells[i + 2, col++].Value = pet.BirthMonth;
+                worksheet.Cells[i + 2, col++].Value = pet.BirthYear;
+                worksheet.Cells[i + 2, col++].Value = pet.Gender ? "Male" : "Female";
+                worksheet.Cells[i + 2, col++].Value = pet.Description;
+                worksheet.Cells[i + 2, col++].Value = pet.IsNeutered;
+                worksheet.Cells[i + 2, col++].Value = pet.IsVaccinated;
+                worksheet.Cells[i + 2, col++].Value = pet.AdoptionStatus;
+                worksheet.Cells[i + 2, col++].Value = pet.CreatedAt?.ToString("yyyy-MM-dd");
+
+                // Dados do UserDto
+                worksheet.Cells[i + 2, col++].Value = pet.User.Id;
+                worksheet.Cells[i + 2, col++].Value = pet.User.Name;
+                worksheet.Cells[i + 2, col++].Value = pet.User.Cellphone;
+                worksheet.Cells[i + 2, col++].Value = pet.User.ZipCode;
+                worksheet.Cells[i + 2, col++].Value = pet.User.Street;
+                worksheet.Cells[i + 2, col++].Value = pet.User.Number;
+                worksheet.Cells[i + 2, col++].Value = pet.User.State;
+                worksheet.Cells[i + 2, col++].Value = pet.User.City;
+                worksheet.Cells[i + 2, col++].Value = pet.User.Longitude;
+                worksheet.Cells[i + 2, col++].Value = pet.User.Latitude;
+            }
+
+            // Converter para array de bytes e retornar como arquivo
+            var stream = new MemoryStream(package.GetAsByteArray());
+            return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = "PetsAndUsers.xlsx"
+            };
+
         }
     }
 }

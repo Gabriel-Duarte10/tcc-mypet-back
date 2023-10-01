@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -41,7 +42,52 @@ namespace tcc_mypet_back.Data.Repository
 
             return petDtos;
         }
+        public async Task<List<PetDTO>> GetFilteredPetsAsync(FilterModel filters)
+        {
+            var query = await _context.Pets
+            .Include(x => x.User)
+            .Include(x => x.Breed).ToListAsync();
 
+            if (filters.AnimalTypeId.HasValue)
+                query = query.Where(p => p.Breed.AnimalTypeId == filters.AnimalTypeId).ToList();
+
+            if (filters.BreedId.HasValue)
+                query = query.Where(p => p.BreedId == filters.BreedId).ToList();
+
+            if (filters.CharacteristicId.HasValue)
+                query = query.Where(p => p.CharacteristicId == filters.CharacteristicId).ToList();
+
+            if (filters.SizeId.HasValue)
+                query = query.Where(p => p.SizeId == filters.SizeId).ToList();
+
+            if (filters.Status.HasValue)
+                query = query.Where(p => p.AdoptionStatus == filters.Status).ToList();
+
+            if (filters.MinAge.HasValue)
+            {
+                var minBirthYear = DateTime.Now.Year - filters.MinAge.Value;
+                query = query.Where(p => p.BirthYear <= minBirthYear).ToList();
+            }
+
+            if (filters.MaxAge.HasValue)
+            {
+                var maxBirthYear = DateTime.Now.Year - filters.MaxAge.Value;
+                query = query.Where(p => p.BirthYear >= maxBirthYear).ToList();
+            }
+
+            if (filters.StartDate.HasValue)
+                query = query.Where(p => p.CreatedAt >= filters.StartDate.Value).ToList();
+
+            if (filters.EndDate.HasValue)
+                query = query.Where(p => p.CreatedAt <= filters.EndDate.Value).ToList();
+
+            if(filters.State != null)
+                query = query.Where(p => p.User.State == filters.State).ToList();
+
+            var petDtos = _mapper.Map<List<PetDTO>>(query);
+
+            return petDtos;
+        }
         public async Task<PetDTO> GetByIdAsync(int id)
         {
             var pet = await _context.Pets
@@ -245,7 +291,7 @@ namespace tcc_mypet_back.Data.Repository
                 throw new Exception("Reported pet not found.");
 
             reported.Counter -= 1;
-            if(reported.Counter == 0)
+            if (reported.Counter == 0)
             {
                 _context.ReportedPets.Remove(reported);
             }
