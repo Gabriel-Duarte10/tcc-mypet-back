@@ -85,17 +85,18 @@ namespace tcc_mypet_back.Data.Repository
                 await _context.SaveChangesAsync();
                 if(request.Images != null)
                 {
-                    foreach (var file in request.Images)
+                    var userImages = request.Images.Select(file =>
                     {
                         var base64Image = ImageExtensions.ConvertFileToBase64(file);
-                        var userImage = new UserImage
+                        return new UserImage
                         {
                             ImageName = file.FileName,
                             Image64 = base64Image,
-                            UserId = userDb.Entity.Id
+                            UserId = userDb.Entity.Id,
+                            CreatedAt = DateTime.Now
                         };
-                        _context.UserImages.Add(userImage);
-                    }
+                    }).ToList();
+                    await _context.UserImages.AddRangeAsync(userImages);
                 }
 
                 await _context.SaveChangesAsync();
