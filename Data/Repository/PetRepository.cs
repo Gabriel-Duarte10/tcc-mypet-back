@@ -11,17 +11,20 @@ using tcc_mypet_back.Data.Interfaces;
 using tcc_mypet_back.Data.Models;
 using tcc_mypet_back.Data.Request;
 using tcc_mypet_back.Extensions;
+using tcc_mypet_back.Services;
 
 namespace tcc_mypet_back.Data.Repository
 {
     public class PetRepository : IPetRepository
     {
         private readonly DataContext _context;
+        private readonly ImageService _imagesService;
         private readonly IMapper _mapper;
 
-        public PetRepository(DataContext context, IMapper mapper)
+        public PetRepository(DataContext context, IMapper mapper, ImageService imagesService)
         {
             _context = context;
+            _imagesService = imagesService;
             _mapper = mapper;
         }
 
@@ -136,16 +139,16 @@ namespace tcc_mypet_back.Data.Repository
                 if (request.Images != null && request.Images.Count > 6)
                     throw new Exception("Cannot attach more than 6 images.");
 
-                foreach (var file in request.Images)
+                var newImages = await _imagesService.UploadImageFireBase(request.Images);
+                foreach (var image in newImages)
                 {
-                    var base64Image = ImageExtensions.ConvertFileToBase64(file);
                     var petImage = new PetImage
                     {
-                        ImageName = file.FileName,
-                        Image64 = base64Image,
+                        ImageName = image.NameImage,
+                        Image64 = image.UrlImage,
                         PetId = petDb.Entity.Id
                     };
-                    _context.PetImages.Add(petImage);
+                    await _context.PetImages.AddAsync(petImage);
                 }
 
                 await _context.SaveChangesAsync();
@@ -178,20 +181,24 @@ namespace tcc_mypet_back.Data.Repository
                 await _context.SaveChangesAsync();
 
                 var existingImages = await _context.PetImages.Where(pi => pi.PetId == pet.Id).ToListAsync();
-                _context.PetImages.RemoveRange(existingImages); // Remove existing images
+                if(existingImages.Count > 0)
+                {
+                    _context.PetImages.RemoveRange(existingImages); // Remove existing images
+                    _imagesService.DeleteImagesFireBase(existingImages.Select(x => x.ImageName).ToList());
+                }
 
                 await _context.SaveChangesAsync();
 
-                foreach (var file in request.Images)
+                var newImages = await _imagesService.UploadImageFireBase(request.Images);
+                foreach (var image in newImages)
                 {
-                    var base64Image = ImageExtensions.ConvertFileToBase64(file);
                     var petImage = new PetImage
                     {
-                        ImageName = file.FileName,
-                        Image64 = base64Image,
+                        ImageName = image.NameImage,
+                        Image64 = image.UrlImage,
                         PetId = pet.Id
                     };
-                    _context.PetImages.Add(petImage);
+                    await _context.PetImages.AddAsync(petImage);
                 }
 
                 await _context.SaveChangesAsync();

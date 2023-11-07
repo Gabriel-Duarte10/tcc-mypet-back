@@ -63,7 +63,7 @@ builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>(
 builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 var twilioSettings = builder.Configuration.GetSection("Twilio").Get<TwilioSettings>();
 builder.Services.AddSingleton(new SMSService(twilioSettings.AccountSID, twilioSettings.AuthToken, twilioSettings.PhoneNumber));
-
+builder.Services.AddScoped<ImageService>();
 
 #endregion
 #region JWT

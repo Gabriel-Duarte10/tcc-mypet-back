@@ -70,8 +70,8 @@ namespace tcc_mypet_back.Controllers
             try 
             {
                 if (request.NewPassword != request.ConfirmNewPassword) return BadRequest("Passwords do not match.");
-                await _passwordRepository.ResetPasswordForUserAsync(request.Email, request.NewPassword);
-                return Ok();
+                
+                return Ok(await _passwordRepository.ResetPasswordForUserAsync(request.Email, request.NewPassword));
             }
             catch (Exception ex)
             {
@@ -111,8 +111,8 @@ namespace tcc_mypet_back.Controllers
         {
             try 
             {
-                await _passwordRepository.ValidateCodeForUserAsync(request);
-                return Ok();
+                
+                return Ok(await _passwordRepository.ValidateCodeForUserAsync(request));
             }
             catch (Exception ex)
             {

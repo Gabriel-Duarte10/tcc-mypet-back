@@ -19,14 +19,16 @@ namespace tcc_mypet_back.Data.Repository
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IConfiguration configuration;
+        private readonly ImageService _imagesService;
         private string ApiKeyGoogle = "";
 
-        public UserRepository(DataContext context, IMapper mapper, IConfiguration configuration)
+        public UserRepository(DataContext context, IMapper mapper, IConfiguration configuration, ImageService imagesService)
         {
             _context = context;
             _mapper = mapper;
             this.configuration = configuration;
             ApiKeyGoogle = this.configuration["Google:KeyGeocoding"] ?? "";
+            _imagesService = imagesService;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllAsync()
@@ -85,18 +87,18 @@ namespace tcc_mypet_back.Data.Repository
                 await _context.SaveChangesAsync();
                 if(request.Images != null)
                 {
-                    var userImages = request.Images.Select(file =>
+                    var newImages = await _imagesService.UploadImageFireBase(request.Images);
+                    foreach (var image in newImages)
                     {
-                        var base64Image = ImageExtensions.ConvertFileToBase64(file);
-                        return new UserImage
+                        var userImage = new UserImage()
                         {
-                            ImageName = file.FileName,
-                            Image64 = base64Image,
+                            ImageName = image.NameImage,
+                            Image64 = image.UrlImage,
                             UserId = userDb.Entity.Id,
                             CreatedAt = DateTime.Now
                         };
-                    }).ToList();
-                    await _context.UserImages.AddRangeAsync(userImages);
+                        await _context.UserImages.AddAsync(userImage);
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -131,20 +133,24 @@ namespace tcc_mypet_back.Data.Repository
                 await _context.SaveChangesAsync();
 
                 var existingImages = await _context.UserImages.Where(ui => ui.UserId == user.Id).ToListAsync();
-                _context.UserImages.RemoveRange(existingImages); // Remove existing images
+                if(existingImages.Count > 0)
+                {
+                    _context.UserImages.RemoveRange(existingImages); // Remove existing images
+                    _imagesService.DeleteImagesFireBase(existingImages.Select(x => x.ImageName).ToList());
+                }
 
                 await _context.SaveChangesAsync();
-
-                foreach (var file in request.Images)
+                var newImages = await _imagesService.UploadImageFireBase(request.Images);
+                foreach (var image in newImages)
                 {
-                    var base64Image = ImageExtensions.ConvertFileToBase64(file);
-                    var userImage = new UserImage
+                    var userImage = new UserImage()
                     {
-                        ImageName = file.FileName,
-                        Image64 = base64Image,
-                        UserId = user.Id
+                        ImageName = image.NameImage,
+                        Image64 = image.UrlImage,
+                        UserId = user.Id,
+                        CreatedAt = DateTime.Now
                     };
-                    _context.UserImages.Add(userImage);
+                    await _context.UserImages.AddAsync(userImage);
                 }
 
                 await _context.SaveChangesAsync();
