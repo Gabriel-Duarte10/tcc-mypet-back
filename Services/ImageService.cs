@@ -23,7 +23,7 @@ namespace tcc_mypet_back.Services
         }
         public async void DeleteImagesFireBase(List<string> imagesNames)
         {
-            var secrets = JsonConvert.DeserializeObject<FirebaseAuthenticationModel>(_configuration.GetSection("FirebaseConfig").ToString());
+            var secrets = _configuration.GetSection("FirebaseConfig").Get<FirebaseAuthenticationModel>();
                 
             FirebaseAuthProvider firebaseConfiguration = new(new FirebaseConfig(secrets.ApiKey));
 
