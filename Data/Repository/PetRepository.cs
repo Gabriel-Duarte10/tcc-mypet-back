@@ -28,11 +28,19 @@ namespace tcc_mypet_back.Data.Repository
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<PetDTO>> GetAllAsync()
+        public async Task<IEnumerable<PetDTO>> GetAllAsync(int userId)
         {
             var pets = await _context.Pets
             .Include(x => x.Breed)
-            .Include(x => x.User).ToListAsync();
+                .ThenInclude(x => x.AnimalType)
+            .Include(x => x.Characteristic)
+            .Include(x => x.Size)
+            .Include(x => x.User)
+            .Where(X => X.UserId != userId)
+            .ToListAsync();
+
+            pets = pets.OrderBy(x => Guid.NewGuid()).ToList();
+
             var petDtos = _mapper.Map<IEnumerable<PetDTO>>(pets);
 
             var petImages = await _context.PetImages.ToListAsync();
@@ -48,6 +56,10 @@ namespace tcc_mypet_back.Data.Repository
         public async Task<List<PetDTO>> GetFilteredPetsAsync(FilterModel filters)
         {
             var query = await _context.Pets
+            .Include(x => x.Breed)
+                .ThenInclude(x => x.AnimalType)
+            .Include(x => x.Characteristic)
+            .Include(x => x.Size)
             .Include(x => x.User)
             .Include(x => x.Breed).ToListAsync();
 
@@ -95,6 +107,10 @@ namespace tcc_mypet_back.Data.Repository
         {
             var pet = await _context.Pets
             .Include(x => x.Breed)
+                .ThenInclude(x => x.AnimalType)
+            .Include(x => x.Characteristic)
+            .Include(x => x.Size)
+            .Include(x => x.Breed)
             .Include(x => x.User).FirstOrDefaultAsync(p => p.Id == id);
             if (pet == null) throw new Exception("Pet not found.");
 
@@ -110,6 +126,9 @@ namespace tcc_mypet_back.Data.Repository
         {
             var pets = await _context.Pets
             .Include(x => x.Breed)
+                .ThenInclude(x => x.AnimalType)
+            .Include(x => x.Characteristic)
+            .Include(x => x.Size)
             .Include(x => x.User).Where(p => p.UserId == userId).ToListAsync();
             var petDtos = _mapper.Map<IEnumerable<PetDTO>>(pets);
 
@@ -311,13 +330,35 @@ namespace tcc_mypet_back.Data.Repository
             return _mapper.Map<List<FavoritePetDto>>(favorites);
         }
 
-        public async Task<List<FavoritePetDto>> GetFavoritePetsByUserIdAsync(int userId)
+        public async Task<List<PetDTO>> GetFavoritePetsByUserIdAsync(int userId)
         {
             var favorites = await _context.FavoritePets
-                            .Where(f => f.UserId == userId)
-                            .ToListAsync();
+                .Where(f => f.UserId == userId)
+                .Select(x => x.PetId)
+                .ToListAsync();
 
-            return _mapper.Map<List<FavoritePetDto>>(favorites);
+             var pets = await _context.Pets
+            .Include(x => x.Breed)
+                .ThenInclude(x => x.AnimalType)
+            .Include(x => x.Characteristic)
+            .Include(x => x.Size)
+            .Include(x => x.User)
+            .Where(X => favorites.Contains(X.Id))
+            .ToListAsync();
+
+            pets = pets.OrderBy(x => Guid.NewGuid()).ToList();
+
+            var petDtos = _mapper.Map<List<PetDTO>>(pets);
+
+            var petImages = await _context.PetImages.ToListAsync();
+            var petImageDtos = _mapper.Map<List<PetImageDTO>>(petImages);
+
+            foreach (var pet in petDtos)
+            {
+                pet.PetImages = petImageDtos.Where(pi => pi.PetId == pet.Id).ToList();
+            }
+
+            return petDtos;
         }
         public async Task<List<ReportedPetDto>> GetReportedPetsByUserIdAsync(int userId)
         {

@@ -24,12 +24,12 @@ namespace tcc_mypet_back.Controllers
             _petRepository = petRepository;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        [HttpGet("not-user/{userId}")]
+        public async Task<IActionResult> GetAllAsync(int userId)
         {
             try
             {
-                var pets = await _petRepository.GetAllAsync();
+                var pets = await _petRepository.GetAllAsync(userId);
                 return Ok(pets);
             }
             catch (Exception ex)

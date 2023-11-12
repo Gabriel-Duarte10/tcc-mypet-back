@@ -5,7 +5,7 @@ namespace tcc_mypet_back.Data.Interfaces
 {
     public interface IPetRepository
     {
-        Task<IEnumerable<PetDTO>> GetAllAsync();
+        Task<IEnumerable<PetDTO>> GetAllAsync(int userId);
         Task<List<PetDTO>> GetFilteredPetsAsync(FilterModel filters);
         Task<PetDTO> GetByIdAsync(int id);
         Task<IEnumerable<PetDTO>> GetPetsByUserIdAsync(int userId);
@@ -17,7 +17,7 @@ namespace tcc_mypet_back.Data.Interfaces
         Task<ReportedPetDto> ReportPetAsync(ReportedPetRequest request);
         Task UnreportPetAsync(int petId);
         Task<List<FavoritePetDto>> GetAllFavoritePetsAsync();
-        Task<List<FavoritePetDto>> GetFavoritePetsByUserIdAsync(int userId);
+        Task<List<PetDTO>> GetFavoritePetsByUserIdAsync(int userId);
         Task<List<ReportedPetDto>> GetReportedPetsByUserIdAsync(int userId);
         Task<List<ReportedPetDto>> GetAllReportedPetsAsync();
     }

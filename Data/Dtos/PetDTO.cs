@@ -20,9 +20,13 @@ namespace tcc_mypet_back.Data.Dtos
 
         // Foreign Keys
         public int AnimalTypeId { get; set; }
+        public AnimalTypeDTO AnimalType { get; set; }
         public int CharacteristicId { get; set; }
+        public CharacteristicDTO Characteristic { get; set; }
         public int BreedId { get; set; }
+        public BreedDTO Breed { get; set; }
         public int SizeId { get; set; }
+        public SizeDTO Size { get; set; }
         public UserDto User { get; set; }
 
         // For Images
