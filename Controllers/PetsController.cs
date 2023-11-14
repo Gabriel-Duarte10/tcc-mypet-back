@@ -121,12 +121,12 @@ namespace tcc_mypet_back.Controllers
             }
         }
 
-        [HttpDelete("favorite")]
-        public async Task<IActionResult> RemoveFromFavoritesAsync([FromQuery] int petId, [FromQuery] int userId)
+        [HttpPut("favorite")]
+        public async Task<IActionResult> RemoveFromFavoritesAsync([FromBody] FavoritePetRequest request)
         {
             try
             {
-                await _petRepository.RemoveFromFavoritesAsync(petId, userId);
+                await _petRepository.RemoveFromFavoritesAsync(request.PetId, request.UserId);
                 return NoContent();
             }
             catch (Exception ex)

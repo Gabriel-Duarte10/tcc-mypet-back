@@ -36,7 +36,7 @@ namespace tcc_mypet_back.Data.Repository
             .Include(x => x.Characteristic)
             .Include(x => x.Size)
             .Include(x => x.User)
-            .Where(X => X.UserId != userId)
+            .Where(f => f.UserId != userId  && f.AdoptionStatus == true)
             .ToListAsync();
 
             pets = pets.OrderBy(x => Guid.NewGuid()).ToList();
@@ -110,7 +110,7 @@ namespace tcc_mypet_back.Data.Repository
                 .ThenInclude(x => x.AnimalType)
             .Include(x => x.Characteristic)
             .Include(x => x.Size)
-            .Include(x => x.Breed)
+            .Include(x => x.Breed) 
             .Include(x => x.User).FirstOrDefaultAsync(p => p.Id == id);
             if (pet == null) throw new Exception("Pet not found.");
 
@@ -129,7 +129,9 @@ namespace tcc_mypet_back.Data.Repository
                 .ThenInclude(x => x.AnimalType)
             .Include(x => x.Characteristic)
             .Include(x => x.Size)
-            .Include(x => x.User).Where(p => p.UserId == userId).ToListAsync();
+            .Include(x => x.User)
+                .Where(f => f.UserId == userId )
+            .ToListAsync();
             var petDtos = _mapper.Map<IEnumerable<PetDTO>>(pets);
 
             var petImages = await _context.PetImages.ToListAsync();
@@ -333,7 +335,8 @@ namespace tcc_mypet_back.Data.Repository
         public async Task<List<PetDTO>> GetFavoritePetsByUserIdAsync(int userId)
         {
             var favorites = await _context.FavoritePets
-                .Where(f => f.UserId == userId)
+                .Include(x => x.Pet)
+                .Where(f => f.UserId == userId && f.DeleteAt == null && f.Pet.AdoptionStatus == true)
                 .Select(x => x.PetId)
                 .ToListAsync();
 
