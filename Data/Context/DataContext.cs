@@ -65,14 +65,14 @@ namespace tcc_mypet_back.Data.Context
                 .HasOne(p => p.User)
                 .WithMany();
 
+            modelBuilder.Entity<PetImage>()
+                .HasOne(tco => tco.Pet)
+                .WithMany(to => to.PetImage)
+                .HasForeignKey(tco => tco.PetId);
+
             // Size
             modelBuilder.Entity<Size>()
                 .HasOne(s => s.Administrator)
-                .WithMany();
-
-            // PetImage
-            modelBuilder.Entity<PetImage>()
-                .HasOne(pi => pi.Pet)
                 .WithMany();
 
             // ProductImage
@@ -82,9 +82,10 @@ namespace tcc_mypet_back.Data.Context
 
             // UserImage
             modelBuilder.Entity<UserImage>()
-                .HasOne(ui => ui.User)
-                .WithMany();
-
+                .HasOne(tco => tco.User)
+                .WithMany(to => to.UserImage)
+                .HasForeignKey(tco => tco.UserId);
+            
             // Characteristic
             modelBuilder.Entity<Characteristic>()
                 .HasOne(f => f.Administrator)

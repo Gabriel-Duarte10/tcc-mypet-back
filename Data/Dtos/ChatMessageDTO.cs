@@ -14,5 +14,7 @@ namespace tcc_mypet_back.Data.Dtos
         public int? ProductId { get; set; }
         public string? Text { get; set; }
         public string? Image64 { get; set; }
+        public int SenderUser { get; set; }
+        public int ReceiverUser { get; set; }
     }
 }

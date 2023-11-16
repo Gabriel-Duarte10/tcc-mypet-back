@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tcc_mypet_back.Data.Context;
 
@@ -11,9 +12,11 @@ using tcc_mypet_back.Data.Context;
 namespace tcc_mypet_back.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231115042320_trazerImagemUserPet")]
+    partial class trazerImagemUserPet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,12 +321,17 @@ namespace tcc_mypet_back.Migrations
                     b.Property<int>("PetId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PetId1")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PetId");
+
+                    b.HasIndex("PetId1");
 
                     b.ToTable("PetImages");
                 });
@@ -586,9 +594,14 @@ namespace tcc_mypet_back.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId1")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("UserImages");
                 });
@@ -860,10 +873,14 @@ namespace tcc_mypet_back.Migrations
             modelBuilder.Entity("tcc_mypet_back.Data.Models.PetImage", b =>
                 {
                     b.HasOne("tcc_mypet_back.Data.Models.Pet", "Pet")
-                        .WithMany("PetImage")
+                        .WithMany()
                         .HasForeignKey("PetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("tcc_mypet_back.Data.Models.Pet", null)
+                        .WithMany("PetImage")
+                        .HasForeignKey("PetId1");
 
                     b.Navigation("Pet");
                 });
@@ -926,10 +943,14 @@ namespace tcc_mypet_back.Migrations
             modelBuilder.Entity("tcc_mypet_back.Data.Models.UserImage", b =>
                 {
                     b.HasOne("tcc_mypet_back.Data.Models.User", "User")
-                        .WithMany("UserImage")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("tcc_mypet_back.Data.Models.User", null)
+                        .WithMany("UserImage")
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });

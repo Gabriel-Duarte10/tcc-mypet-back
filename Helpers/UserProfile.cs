@@ -9,11 +9,13 @@ namespace tcc_mypet_back.Helpers
     {
         public UserProfile()
         {
-            CreateMap<User, UserDto>();
-            CreateMap<UserImage, UserImageDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.UserImages, opt => opt.MapFrom(src => src.UserImage))
+                .ReverseMap();
+            CreateMap<UserImage, UserImageDto>().ReverseMap();
             CreateMap<UserCreateRequest, User>();
             CreateMap<UserUpdateRequest, User>();
-            CreateMap<UserImageRequest, UserImage>();
+            CreateMap<UserImageRequest, UserImage>().ReverseMap();
         }
     }
 }

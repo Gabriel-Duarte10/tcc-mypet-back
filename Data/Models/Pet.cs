@@ -27,6 +27,8 @@ namespace tcc_mypet_back.Data.Models
         public Breed Breed { get; set; }
         public Size Size { get; set; }
         public User User { get; set; }
+
+        public virtual ICollection<PetImage> PetImage { get; set; }
     }
 
 }

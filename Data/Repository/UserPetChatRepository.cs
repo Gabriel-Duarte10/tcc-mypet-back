@@ -28,19 +28,26 @@ namespace tcc_mypet_back.Data.Repository
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var sessionDb =  await _context.UserPetChatSessions.AddAsync(_mapper.Map<UserPetChatSession>(request));
-                
-                sessionDb.Entity.CreatedAt = DateTime.Now;
-                await _context.SaveChangesAsync();
-
-                var session = await _context.UserPetChatSessions.Where(s => s.Id == sessionDb.Entity.Id)
+                var sessionExist = _context.UserPetChatSessions
                     .Include(s => s.User1)
                     .Include(s => s.User2)
                     .Include(s => s.Pet)
-                    .FirstOrDefaultAsync();
+                    .Where(x => 
+                        x.User1Id == request.User1Id && 
+                        x.User2Id == request.User2Id &&
+                        x.PetId == request.PetId)
+                    .FirstOrDefault();
 
+                if(sessionExist == null)
+                {
+                    var sessionDb =  await _context.UserPetChatSessions.AddAsync(_mapper.Map<UserPetChatSession>(request));
+                    sessionExist = sessionDb.Entity;
+                    sessionExist.CreatedAt = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                }
+                
                 await transaction.CommitAsync();
-                return _mapper.Map<UserPetChatSessionDTO>(session);
+                return _mapper.Map<UserPetChatSessionDTO>(sessionExist);
             }
             catch (Exception ex)
             {
@@ -53,8 +60,11 @@ namespace tcc_mypet_back.Data.Repository
         {
             var sessions = await _context.UserPetChatSessions
                 .Include(s => s.User1)
+                    .ThenInclude(x => x.UserImage)
                 .Include(s => s.User2)
+                    .ThenInclude(x => x.UserImage)
                 .Include(s => s.Pet)
+                    .ThenInclude(x => x.PetImage)
                 .Where(s => s.User1Id == userId || s.User2Id == userId)
                 .ToListAsync();
 

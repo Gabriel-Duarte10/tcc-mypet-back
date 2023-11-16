@@ -11,6 +11,7 @@ namespace tcc_mypet_back.Data.Dtos
         public UserDto User1 { get; set; }
         public UserDto User2 { get; set; }
         public PetDTO Pet { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 
     public class UserPetChatDTO
@@ -20,5 +21,6 @@ namespace tcc_mypet_back.Data.Dtos
         public UserDto SenderUser { get; set; }
         public string? Text { get; set; }
         public string? Image64 { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

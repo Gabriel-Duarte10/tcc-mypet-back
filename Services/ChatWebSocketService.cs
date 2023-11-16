@@ -84,14 +84,14 @@ namespace tcc_mypet_back.Services
                 {
                     await SaveMessage(chatMessageDto, dataContext);
 
-                    if (WebSocketManager.ActiveConnections.TryGetValue(chatMessageDto.User2Id, out var receiverWebSocket))
+                    if (WebSocketManager.ActiveConnections.TryGetValue(chatMessageDto.ReceiverUser, out var receiverWebSocket))
                     {
                         var responseData = Encoding.UTF8.GetBytes(messageJson); 
                         await receiverWebSocket.SendAsync(new ArraySegment<byte>(responseData), result.MessageType, result.EndOfMessage, CancellationToken.None);
                     }
 
                     // Enviar a mensagem também de volta ao remetente para que ele possa vê-la no chat.
-                    if (WebSocketManager.ActiveConnections.TryGetValue(chatMessageDto.User1Id, out var senderWebSocket))
+                    if (WebSocketManager.ActiveConnections.TryGetValue(chatMessageDto.SenderUser, out var senderWebSocket))
                     {
                         var responseData = Encoding.UTF8.GetBytes(messageJson); 
                         await senderWebSocket.SendAsync(new ArraySegment<byte>(responseData), result.MessageType, result.EndOfMessage, CancellationToken.None);
@@ -105,13 +105,6 @@ namespace tcc_mypet_back.Services
             {
                 WebSocketManager.ActiveConnections.Remove(userId);
             }
-        }
-
-        private int GetUserIdFromRequest(HttpRequest request)
-        {
-            // Implementação exemplo: extrair ID do usuário do cabeçalho ou parâmetro da solicitação
-            // Ajuste conforme necessário
-            return int.Parse(request.Headers["UserId"].ToString());
         }
         public async Task SaveMessage(ChatMessageDTO message, DataContext dataContext)
         {
@@ -139,40 +132,13 @@ namespace tcc_mypet_back.Services
                     var petChatMessage = new UserPetChat
                     {
                         UserPetChatSessionId = petChatSession.Id,
-                        SenderUserId = message.User1Id,
+                        SenderUserId = message.SenderUser,
                         Text = message.Text,
                         Image64 = message.Image64
                     };
                     dataContext.UserPetChats.Add(petChatMessage);
                 }
-                else if (message.ProductId.HasValue)
-                {
-                    var productChatSession = await dataContext.UserProductChatSessions
-                        .FirstOrDefaultAsync(cs => cs.Id == message.SessionId);
-
-                    if (productChatSession == null)
-                    {
-                        productChatSession = new UserProductChatSession
-                        {
-                            User1Id = message.User1Id,
-                            User2Id = message.User2Id,
-                            ProductId = message.ProductId.Value,
-                            CreatedAt = DateTime.Now
-                        };
-                        dataContext.UserProductChatSessions.Add(productChatSession);
-                        await dataContext.SaveChangesAsync();  // Salve a sessão antes de usá-la
-                    }
-
-                    var productChatMessage = new UserProductChat
-                    {
-                        UserProductChatSessionId = productChatSession.Id,
-                        SenderUserId = message.User1Id,
-                        Text = message.Text,
-                        Image64 = message.Image64
-                    };
-                    dataContext.UserProductChats.Add(productChatMessage);
-                }
-
+                
                 await dataContext.SaveChangesAsync();
             }
             catch (System.Exception error)

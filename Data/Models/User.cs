@@ -20,6 +20,7 @@ namespace tcc_mypet_back.Data.Models
         public double Latitude { get; set; }
         public bool IsActive { get; set; }
         public int? CellphoneCode { get; set; }
+        public virtual ICollection<UserImage> UserImage { get; set; }
     }
 
 }
