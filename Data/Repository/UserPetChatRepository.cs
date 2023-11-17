@@ -32,18 +32,27 @@ namespace tcc_mypet_back.Data.Repository
                     .Include(s => s.User1)
                     .Include(s => s.User2)
                     .Include(s => s.Pet)
+                    .ThenInclude(p => p.PetImage)
                     .Where(x => 
-                        x.User1Id == request.User1Id && 
-                        x.User2Id == request.User2Id &&
+                        ((x.User1Id == request.User1Id && x.User2Id == request.User2Id) || 
+                        (x.User1Id == request.User2Id && x.User2Id == request.User1Id))
+                         &&
                         x.PetId == request.PetId)
                     .FirstOrDefault();
 
                 if(sessionExist == null)
                 {
                     var sessionDb =  await _context.UserPetChatSessions.AddAsync(_mapper.Map<UserPetChatSession>(request));
-                    sessionExist = sessionDb.Entity;
-                    sessionExist.CreatedAt = DateTime.Now;
+                    sessionDb.Entity.CreatedAt = DateTime.Now;
                     await _context.SaveChangesAsync();
+                    sessionExist = _context.UserPetChatSessions
+                    .Include(s => s.User1)
+                    .Include(s => s.User2)
+                    .Include(s => s.Pet)
+                    .ThenInclude(p => p.PetImage)
+                    .Where(x => x.Id == sessionDb.Entity.Id)
+                    .FirstOrDefault();
+
                 }
                 
                 await transaction.CommitAsync();
