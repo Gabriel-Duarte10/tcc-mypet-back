@@ -27,7 +27,23 @@ namespace tcc_mypet_back.Data.Repository
             _imagesService = imagesService;
             _mapper = mapper;
         }
+        public async Task<IEnumerable<PetDTO>> GetAllDashboardAsync()
+        {
+            var pets = await _context.Pets
+            .Include(x => x.Breed)
+                .ThenInclude(x => x.AnimalType)
+            .Include(x => x.Characteristic)
+            .Include(x => x.Size)
+            .Include(x => x.User)
+            .ToListAsync();
 
+            pets = pets.OrderBy(x => Guid.NewGuid()).ToList();
+
+            var petDtos = _mapper.Map<IEnumerable<PetDTO>>(pets);
+
+
+            return petDtos;
+        }
         public async Task<IEnumerable<PetDTO>> GetAllAsync(int userId)
         {
             var pets = await _context.Pets
@@ -63,16 +79,16 @@ namespace tcc_mypet_back.Data.Repository
             .Include(x => x.User)
             .Include(x => x.Breed).ToListAsync();
 
-            if (filters.AnimalTypeId.HasValue)
+            if (filters.AnimalTypeId.HasValue && filters.AnimalTypeId != 0)
                 query = query.Where(p => p.Breed.AnimalTypeId == filters.AnimalTypeId).ToList();
 
-            if (filters.BreedId.HasValue)
+            if (filters.BreedId.HasValue && filters.BreedId != 0)
                 query = query.Where(p => p.BreedId == filters.BreedId).ToList();
 
-            if (filters.CharacteristicId.HasValue)
+            if (filters.CharacteristicId.HasValue && filters.CharacteristicId != 0)
                 query = query.Where(p => p.CharacteristicId == filters.CharacteristicId).ToList();
 
-            if (filters.SizeId.HasValue)
+            if (filters.SizeId.HasValue && filters.SizeId != 0)
                 query = query.Where(p => p.SizeId == filters.SizeId).ToList();
 
             if (filters.Status.HasValue)
@@ -84,7 +100,7 @@ namespace tcc_mypet_back.Data.Repository
                 query = query.Where(p => p.BirthYear <= minBirthYear).ToList();
             }
 
-            if (filters.MaxAge.HasValue)
+            if (filters.MaxAge.HasValue && filters.MaxAge != 0)
             {
                 var maxBirthYear = DateTime.Now.Year - filters.MaxAge.Value;
                 query = query.Where(p => p.BirthYear >= maxBirthYear).ToList();
@@ -96,7 +112,7 @@ namespace tcc_mypet_back.Data.Repository
             if (filters.EndDate.HasValue)
                 query = query.Where(p => p.CreatedAt <= filters.EndDate.Value).ToList();
 
-            if(filters.State != null)
+            if(filters.State != null && filters.State != "")
                 query = query.Where(p => p.User.State == filters.State).ToList();
 
             var petDtos = _mapper.Map<List<PetDTO>>(query);
