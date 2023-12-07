@@ -106,11 +106,16 @@ namespace tcc_mypet_back.Data.Repository
                 query = query.Where(p => p.BirthYear >= maxBirthYear).ToList();
             }
 
-            if (filters.StartDate.HasValue)
-                query = query.Where(p => p.CreatedAt >= filters.StartDate.Value).ToList();
+            if (filters.StartDate.HasValue) {
+                DateTime startDate = filters.StartDate.Value.Date; // Normaliza para a meia-noite
+                query = query.Where(p => p.CreatedAt?.Date >= startDate).ToList();
+            }
 
-            if (filters.EndDate.HasValue)
-                query = query.Where(p => p.CreatedAt <= filters.EndDate.Value).ToList();
+            if (filters.EndDate.HasValue) {
+                DateTime endDate = filters.EndDate.Value.Date; // Normaliza para a meia-noite
+                query = query.Where(p => p.CreatedAt?.Date <= endDate).ToList();
+            }
+
 
             if(filters.State != null && filters.State != "")
                 query = query.Where(p => p.User.State == filters.State).ToList();

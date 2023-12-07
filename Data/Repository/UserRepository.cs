@@ -130,6 +130,13 @@ namespace tcc_mypet_back.Data.Repository
                     throw new Exception("Cannot attach more than 3 images.");
 
                 user.UpdatedAt = DateTime.UtcNow;
+                // Obtendo a latitude e longitude usando a classe auxiliar
+                string fullAddress = $"{request.Street}, {request.Number}, {request.City}, {request.State}, {request.ZipCode}";
+                var geocodingHelper = new GeocodingHelper(configuration["GoogleMaps:KeyGeocoding"] ?? ""); // Supondo que sua chave da API está em appsettings sob "GoogleMaps:ApiKey"
+                var (latitude, longitude) = await geocodingHelper.GetLatLongFromAddress(fullAddress);
+                user.Latitude = latitude;
+                user.Longitude = longitude;
+                
                 await _context.SaveChangesAsync();
 
                 var existingImages = await _context.UserImages.Where(ui => ui.UserId == user.Id).ToListAsync();
